@@ -266,7 +266,7 @@ if __name__ == "__main__":
     real_scores = torch.FloatTensor(np.random.rand(len(entity2index)))
 
     optimizer = torch.optim.Adam(filter(lambda p : p.requires_grad, model.parameters()), lr=0.005, weight_decay=0.0005)
-    for epoch in tqdm(range(1), desc="Training"):
+    for epoch in tqdm(range(50), desc="Training"):
         optimizer.zero_grad()
         scores = model(att)
         loss = loss_function(scores[:10], real_scores[:10])
@@ -275,28 +275,3 @@ if __name__ == "__main__":
         loss.backward()
         optimizer.step()
 
-
-    """
-    # DEGREE
-    degree = degree
-    # ATT
-    att = torch.eye(len(G.nodes()))
-    model = GENI(2, 20, 2, degree, 2, att.size(1), adjs)
-    model = model
-    # real_scores = torch.FloatTensor(np.random.rand(len(G.nodes())))
-    real_scores = degree / degree.max()
-
-    # optimizer = torch.optim.Adam()
-    optimizer = torch.optim.Adam(filter(lambda p : p.requires_grad, model.parameters()), lr=0.01)
-    # import pdb
-    # pdb.set_trace()
-    for epoch in tqdm(range(20), desc="Training"):
-        optimizer.zero_grad()
-        scores = model(att)
-        loss = loss_function(scores[:10], real_scores[:10])
-        print("vvalidate score: {:.4f}".format(loss_function(scores[10:], real_scores[10:])))
-        print(loss.data)
-        loss.backward()
-        optimizer.step()
-
-    """
