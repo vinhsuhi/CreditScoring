@@ -261,6 +261,9 @@ if __name__ == "__main__":
                 att_dim=len(entity2index),
                 adjs=edge_list_dict
     )
+
+    model = model.cuda()
+    
     real_scores = torch.FloatTensor(np.random.rand(len(entity2index))).cuda()
 
     optimizer = torch.optim.Adam(filter(lambda p : p.requires_grad, model.parameters()), lr=0.01)
