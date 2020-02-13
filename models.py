@@ -87,7 +87,6 @@ class SelfAttention(nn.Module):
         self.adjs = adjs
         self.attention_weight = nn.Parameter(torch.Tensor(edge_emb_dim + 2, 1))
         nn.init.xavier_normal_(self.attention_weight.data)
-        self.attention_weight = self.attention_weight.view(edge_emb_dim + 2)
         self.act = nn.LeakyReLU(negative_slope=0.2)
         self.softmax_layer = nn.Softmax(dim=-1)
 
@@ -102,9 +101,7 @@ class SelfAttention(nn.Module):
         cuda = True
         if cuda:
             sum_attention = sum_attention
-            zero_matrix = zero_matrix
         for i in range(len(edge_type_emb)):
-            # adj_i = edge_list_to_dense(self.adjs[i], len(scores))
             edge_list = self.adjs[i]
             edge_type_i = edge_type_emb[i]
             for k in range(len(edge_list[0])):
