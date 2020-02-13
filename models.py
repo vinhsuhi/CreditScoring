@@ -108,18 +108,11 @@ class SelfAttention(nn.Module):
             source_scores = scores[edge_list[0]]
             target_scores = scores[edge_list[1]]
             concated_vector = torch.cat([source_scores, edge_type_i_repeated, target_scores], dim=-1)
-            import pdb
-            pdb.set_trace()
-            # for k in range(len(edge_list[0])):
-            #     source_node = edge_list[0][k]
-            #     target_node = edge_list[1][k]
-            #     concated_vector = torch.cat([scores[source_node], edge_type_i, scores[target_node]], dim=-1)
-            #     attention_ik = concated_vector.matmul(self.attention_weight)
-            #     sum_attention[source_node, target_node] += attention_ik[0]
+            attention_i = concated_vector.matmul(self.attention_weight)
+            attention_i = attention_i.view(len(edge_list[0]))
+            sum_attention[edge_list[0], edge_list[1]] += attention_i
 
-            
-
-        sum_attention = sum_attention.squeeze()
+        # sum_attention = sum_attention.squeeze()
         att = self.act(sum_attention)
         att = self.softmax_layer(att)
         return att
