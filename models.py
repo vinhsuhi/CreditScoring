@@ -24,7 +24,7 @@ def init_weight(modules, activation=None):
 
 # def get_ith_adj(predicates, edge_path, entity_to_index, relation_index):
 #     N = len(entity_to_index)
-#     adj = torch.zeros(N, N).float().cuda()
+#     adj = torch.zeros(N, N).float()
 
 
 
@@ -44,7 +44,7 @@ class ScoringNetwork(nn.Module):
     def forward(self, input):
         try:
             if input == 'eye':
-                input = torch.eye(self.att_dim).float().cuda()
+                input = torch.eye(self.att_dim).float()
         except:
             print("ERROR")
             exit()
@@ -102,8 +102,8 @@ class SelfAttention(nn.Module):
         # if self.adjs[0].is_cuda:
         cuda = True
         if cuda:
-            sum_attention = sum_attention.cuda()
-            zero_matrix = zero_matrix.cuda()
+            sum_attention = sum_attention
+            zero_matrix = zero_matrix
         for i in range(len(edge_type_emb)):
             adj_i = edge_list_to_dense(adjs[i])
             edge_type_i = edge_type_emb[i]
@@ -189,7 +189,7 @@ def edge_list_to_dense(edge_list, num_nodes):
     dense = torch.zeros(num_nodes, num_nodes)
     dense[edge_list[0], edge_list[1]] = 1
     dense[edge_list[1], edge_list[0]] = 1
-    dense = dense.float().cuda()
+    dense = dense.float()
     return dense
 
 
@@ -249,7 +249,7 @@ if __name__ == "__main__":
                 edge_list_dict[r_index][0].append(e1_index)
                 edge_list_dict[r_index][1].append(e2_index)
     
-    degree = torch.FloatTensor(degree).cuda()
+    degree = torch.FloatTensor(degree)
     att = "eye"
 
     model = GENI(
@@ -262,9 +262,9 @@ if __name__ == "__main__":
                 adjs=edge_list_dict
     )
 
-    model = model.cuda()
+    model = model
     
-    real_scores = torch.FloatTensor(np.random.rand(len(entity2index))).cuda()
+    real_scores = torch.FloatTensor(np.random.rand(len(entity2index)))
 
     optimizer = torch.optim.Adam(filter(lambda p : p.requires_grad, model.parameters()), lr=0.01)
     for epoch in tqdm(range(1), desc="Training"):
@@ -279,12 +279,12 @@ if __name__ == "__main__":
 
     """
     # DEGREE
-    degree = degree.cuda()
+    degree = degree
     # ATT
-    att = torch.eye(len(G.nodes())).cuda()
+    att = torch.eye(len(G.nodes()))
     model = GENI(2, 20, 2, degree, 2, att.size(1), adjs)
-    model = model.cuda()
-    # real_scores = torch.FloatTensor(np.random.rand(len(G.nodes()))).cuda()
+    model = model
+    # real_scores = torch.FloatTensor(np.random.rand(len(G.nodes())))
     real_scores = degree / degree.max()
 
     # optimizer = torch.optim.Adam()
