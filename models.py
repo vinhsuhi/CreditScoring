@@ -266,7 +266,7 @@ if __name__ == "__main__":
     real_scores = torch.FloatTensor(np.random.rand(len(entity2index)))
 
     optimizer = torch.optim.Adam(filter(lambda p : p.requires_grad, model.parameters()), lr=0.005, weight_decay=0.0005)
-    for epoch in tqdm(range(50), desc="Training"):
+    for epoch in tqdm(range(3), desc="Training"):
         optimizer.zero_grad()
         scores = model(att)
         loss = loss_function(scores[:10], real_scores[:10])
