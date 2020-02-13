@@ -41,6 +41,8 @@ class ScoringNetwork(nn.Module):
         # init_weight(self.modules)
     
     def forward(self, input):
+        import pdb
+        pdb.set_trace()
         return self.linear(input)
 
 
