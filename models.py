@@ -37,8 +37,12 @@ class ScoringNetwork(nn.Module):
     def __init__(self, att_dim):
         super(ScoringNetwork, self).__init__()
         self.att_dim = att_dim
-        self.linear = nn.Linear(att_dim, 1)
-        nn.init.xavier_uniform_(self.linear.weight)
+        self.linear1 = nn.Linear(att_dim, int(att_dim * 0.75))
+        self.linear2 = nn.Linear(int(att_dim * 0.75), 1)
+        self.act = nn.LeakyReLU(negative_slope=0.2)
+
+        nn.init.xavier_uniform_(self.linear1.weight)
+        nn.init.xavier_uniform_(self.linear2.weight)
         # init_weight(self.modules)
     
     def forward(self, input):
@@ -48,7 +52,7 @@ class ScoringNetwork(nn.Module):
         except:
             print("ERROR")
             exit()
-        return self.linear(input)
+        return self.linear2(self.act(self.linear(input)))
 
 
 
@@ -249,10 +253,10 @@ if __name__ == "__main__":
 
     model = GENI(
                 n_edge_types=len(edge_list_dict),
-                edge_emb_dim=20,
-                num_agg_layer=2,
+                edge_emb_dim=10,
+                num_agg_layer=3,
                 deg = degree,
-                num_head_attentions=2,
+                num_head_attentions=4,
                 att_dim=len(entity2index),
                 adjs=edge_list_dict
     )
@@ -261,7 +265,7 @@ if __name__ == "__main__":
     
     real_scores = torch.FloatTensor(np.random.rand(len(entity2index)))
 
-    optimizer = torch.optim.Adam(filter(lambda p : p.requires_grad, model.parameters()), lr=0.01)
+    optimizer = torch.optim.Adam(filter(lambda p : p.requires_grad, model.parameters()), lr=0.005, weight_decay=0.0005)
     for epoch in tqdm(range(1), desc="Training"):
         optimizer.zero_grad()
         scores = model(att)
