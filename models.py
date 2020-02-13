@@ -36,13 +36,18 @@ class ScoringNetwork(nn.Module):
     """
     def __init__(self, att_dim):
         super(ScoringNetwork, self).__init__()
+        self.att_dim = att_dim
         self.linear = nn.Linear(att_dim, 1)
         nn.init.xavier_uniform_(self.linear.weight)
         # init_weight(self.modules)
     
     def forward(self, input):
-        import pdb
-        pdb.set_trace()
+        try:
+            if input == 'eye':
+                input = torch.eye(self.att_dim).float().cuda()
+        except:
+            print("ERROR")
+            exit()
         return self.linear(input)
 
 
