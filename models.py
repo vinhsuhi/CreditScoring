@@ -109,9 +109,7 @@ class SelfAttention(nn.Module):
                 target_node = edge_list[1][k]
                 concated_vector = torch.cat([scores[source_node], edge_type_i, scores[target_node]], dim=-1)
                 attention_ik = concated_vector.matmul(self.attention_weight)
-                import pdb
-                pdb.set_trace()
-                sum_attention[source_node, target_node] += attention_ik
+                sum_attention[source_node, target_node] += attention_ik[0]
 
             
 
