@@ -101,7 +101,7 @@ class SelfAttention(nn.Module):
         cuda = True
         if cuda:
             sum_attention = sum_attention
-        for i in range(len(edge_type_emb)):
+        for i in tqdm(range(len(edge_type_emb))):
             edge_list = self.adjs[i]
             edge_type_i = edge_type_emb[i]
             edge_type_i_repeated = edge_type_i.repeat(len(edge_list[0])).view(len(edge_list[0]), -1) # n_edgex x emb_dim
