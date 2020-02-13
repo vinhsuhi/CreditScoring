@@ -52,7 +52,7 @@ class ScoringNetwork(nn.Module):
         except:
             print("ERROR")
             exit()
-        return self.linear2(self.act(self.linear(input)))
+        return self.linear2(self.act(self.linear1(input)))
 
 
 
