@@ -87,6 +87,7 @@ class SelfAttention(nn.Module):
         self.adjs = adjs
         self.attention_weight = nn.Parameter(torch.Tensor(edge_emb_dim + 2, 1))
         nn.init.xavier_normal_(self.attention_weight.data)
+        self.attention_weight = self.attention_weight.view(edge_emb_dim + 2)
         self.act = nn.LeakyReLU(negative_slope=0.2)
         self.softmax_layer = nn.Softmax(dim=-1)
 
@@ -94,28 +95,29 @@ class SelfAttention(nn.Module):
     def gen_attention_matrix(self, scores, edge_type_emb):
         """
         TODO: DONE!
+        TODO: Design for sparse matrix
         """
         N = scores.size(0)
-        repeated_scores = scores.repeat(1, N)
-        sum_attention = torch.zeros(N, N, 1)
-        zero_matrix = torch.zeros(N, N, edge_type_emb[0].size(-1))
-        # if self.adjs[0].is_cuda:
+        sum_attention = torch.zeros(N, N)
         cuda = True
         if cuda:
             sum_attention = sum_attention
             zero_matrix = zero_matrix
         for i in range(len(edge_type_emb)):
-            adj_i = edge_list_to_dense(self.adjs[i], len(scores))
+            # adj_i = edge_list_to_dense(self.adjs[i], len(scores))
+            edge_list = self.adjs[i]
             edge_type_i = edge_type_emb[i]
-            adj_i_source = (repeated_scores * adj_i).resize(N, N, 1) # 34 x 34 x 1
-            adj_i_target = (repeated_scores.t() * adj_i).resize(N, N , 1)
-            adj_i_multi = torch.cat([adj_i.view(N, N, 1)] * len(edge_type_i), dim=-1)
-            edge_matrix = edge_type_i.repeat(N, N).view(N, N, -1)
-            adj_edge = torch.where(adj_i_multi > 0, edge_matrix, zero_matrix)
-            concated_attention = torch.cat([adj_i_source, adj_edge, adj_i_target], dim=-1)
-            attention_i = concated_attention.matmul(self.attention_weight)
-            sum_attention += attention_i
-        # print(self.attention_weight.grad)
+            for k in range(len(edge_list[0])):
+                source_node = edge_list[0][k]
+                target_node = edge_list[1][k]
+                concated_vector = torch.cat([scores[source_node], edge_type_i, scores[target_node]], dim=-1)
+                attention_ik = concated_vector.matmul(self.attention_weight)
+                import pdb
+                pdb.set_trace()
+                sum_attention[source_node, target_node] += attention_ik
+
+            
+
         sum_attention = sum_attention.squeeze()
         att = self.act(sum_attention)
         att = self.softmax_layer(att)
