@@ -105,7 +105,7 @@ class SelfAttention(nn.Module):
             sum_attention = sum_attention
             zero_matrix = zero_matrix
         for i in range(len(edge_type_emb)):
-            adj_i = edge_list_to_dense(self.adjs[i])
+            adj_i = edge_list_to_dense(self.adjs[i], len(scores))
             edge_type_i = edge_type_emb[i]
             adj_i_source = (repeated_scores * adj_i).resize(N, N, 1) # 34 x 34 x 1
             adj_i_target = (repeated_scores.t() * adj_i).resize(N, N , 1)
