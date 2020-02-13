@@ -44,7 +44,7 @@ class ScoringNetwork(nn.Module):
     def forward(self, input):
         try:
             if input == 'eye':
-                input = torch.eye(self.att_dim).float()
+                input = torch.eye(self.att_dim).float().cuda()
         except:
             print("ERROR")
             exit()
@@ -100,7 +100,7 @@ class SelfAttention(nn.Module):
         sum_attention = torch.zeros(N, N)
         cuda = True
         if cuda:
-            sum_attention = sum_attention
+            sum_attention = sum_attention.cuda()
         for i in tqdm(range(len(edge_type_emb))):
             edge_list = self.adjs[i]
             edge_type_i = edge_type_emb[i]
@@ -112,7 +112,6 @@ class SelfAttention(nn.Module):
             attention_i = attention_i.view(len(edge_list[0]))
             sum_attention[edge_list[0], edge_list[1]] += attention_i
 
-        # sum_attention = sum_attention.squeeze()
         att = self.act(sum_attention)
         att = self.softmax_layer(att)
         return att
@@ -182,7 +181,7 @@ def loss_function(predicted_scores, real_scores):
 
 
 def edge_list_to_dense(edge_list, num_nodes):
-    dense = torch.zeros(num_nodes, num_nodes)
+    dense = torch.zeros(num_nodes, num_nodes).cuda()
     dense[edge_list[0], edge_list[1]] = 1
     dense[edge_list[1], edge_list[0]] = 1
     dense = dense.float()
@@ -245,7 +244,7 @@ if __name__ == "__main__":
                 edge_list_dict[r_index][0].append(e1_index)
                 edge_list_dict[r_index][1].append(e2_index)
     
-    degree = torch.FloatTensor(degree)
+    degree = torch.FloatTensor(degree).cuda()
     att = "eye"
 
     model = GENI(
@@ -258,7 +257,7 @@ if __name__ == "__main__":
                 adjs=edge_list_dict
     )
 
-    model = model
+    model = model.cuda()
     
     real_scores = torch.FloatTensor(np.random.rand(len(entity2index)))
 
